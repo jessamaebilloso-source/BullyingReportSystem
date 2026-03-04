@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anonymous Bullying Report System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        header {
+            background-color: #05998c;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+        nav a {
+            color: white;
+            margin: 0 1rem;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .header-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 200px;
+    padding: 10px;
+    
+}
+
+        main {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        section {
+            display: none;
+        }
+        section.active {
+            display: block;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            margin-top: 1rem;
+        }
+        input, textarea {
+            padding: 0.5rem;
+            margin-top: 0.5rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 0.5rem;
+            text-align: left;
+        }
+        footer {
+            text-align: center;
+            padding: 1rem;
+            background-color: #05998c;
+            color: white;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+        <img src="logo.png.png"Logo class="logo" width="100px" height="100px" >
+        
+        <h1>Anonymous Bullying Report System</h1 >
+        <div class="header-text">
+        
+        <nav>
+            <a onclick="showSection('submit')">Submit Report</a>
+            <a onclick="showSection('track')">Track Case</a>
+            <a onclick="showSection('admin')">Admin</a>
+        </nav>
+    </header>
+    <main>
+        <section id="submit" class="active">
+            <h2>Submit an Anonymous Report</h2>
+            <form id="bullying-report">
+                <label for="description">Describe the Incident:</label>
+                <textarea id="description" name="description" required></textarea>
+                
+                <label for="location">People's Involved:</label>
+                <input type="text" id="location" name="location">
+                
+                <label for="date">Date of Incident:</label>
+                <input type="date" id="date" name="date" required>
+                
+                <button type="submit">Submit Report</button>
+            </form>
+            <p>Your report is anonymous and secure (stored locally for demo).</p>
+        </section>
+        
+        <section id="track">
+            <h2>Track Your Case</h2>
+            <form id="track-form">
+                <label for="case-id">Case ID:</label>
+                <input type="text" id="case-id" name="case-id" required>
+                <button type="submit">Check Status</button>
+            </form>
+            <div id="status-display" style="display:none;">
+                <h3>Case Status</h3>
+                <p>Status: <span id="status"></span></p>
+                <p>Updates: <span id="updates"></span></p>
+            </div>
+        </section>
+        
+        <section id="admin">
+            <h2>Admin Dashboard</h2>
+            <table id="reports-table">
+                <thead>
+                    <tr>
+                        <th>Case ID</th>
+                        <th>Description</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="reports-body">
+                    <!-- Reports will be populated here -->
+                </tbody>
+            </table>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2026 Anonymous Report System. All rights reserved.</p>
+    </footer>
+    <script>
+        // Function to show sections
+        function showSection(sectionId) {
+            document.querySelectorAll('section').forEach(sec => sec.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            if (sectionId === 'admin') {
+                loadReports();
+            }
+        }
+
+        // Handle report submission
+        document.getElementById('bullying-report').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const description = document.getElementById('description').value;
+            const location = document.getElementById('location').value;
+            const date = document.getElementById('date').value;
+            const caseId = Math.random().toString(36).substr(2, 9).toUpperCase();
+            const report = { caseId, description, location, date, status: 'Under Review', updates: 'Your report is being reviewed.' };
+            
+            // Store in localStorage (demo only; not secure)
+            let reports = JSON.parse(localStorage.getItem('reports')) || [];
+            reports.push(report);
+            localStorage.setItem('reports', JSON.stringify(reports));
+            
+            alert('Report submitted anonymously. Your case ID is: ' + caseId);
+            this.reset();
+        });
+
+        // Handle case tracking
+        document.getElementById('track-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const caseId = document.getElementById('case-id').value.toUpperCase();
+            const reports = JSON.parse(localStorage.getItem('reports')) || [];
+            const report = reports.find(r => r.caseId === caseId);
+            
+            if (report) {
+                document.getElementById('status').textContent = report.status;
+                document.getElementById('updates').textContent = report.updates;
+                document.getElementById('status-display').style.display = 'block';
+            } else {
+                alert('Case ID not found.');
+                document.getElementById('status-display').style.display = 'none';
+            }
+        });
+
+        // Load reports for admin
+        function loadReports() {
+            const reports = JSON.parse(localStorage.getItem('reports')) || [];
+            const tbody = document.getElementById('reports-body');
+            tbody.innerHTML = '';
+            reports.forEach(report => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${report.caseId}</td>
+                    <td>${report.description}</td>
+                    <td>${report.status}</td>
+                    <td><button onclick="updateStatus('${report.caseId}')">Update Status</button></td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Update status (admin)
+        function updateStatus(caseId) {
+            const newStatus = prompt('Enter new status:');
+            if (newStatus) {
+                let reports = JSON.parse(localStorage.getItem('reports')) || [];
+                const report = reports.find(r => r.caseId === caseId);
+                if (report) {
+                    report.status = newStatus;
+                    report.updates = `Status updated to: ${newStatus}`;
+                    localStorage.setItem('reports', JSON.stringify(reports));
+                    loadReports();
+                }
+            }
+        }
+    </script>
+</body>
+</html>
